@@ -1,4 +1,6 @@
 <?php
+$timeStart = microtime(true);
+
 $data = [];
 
 //skapa en koppling till filen och spara i $handle (och misslyckas det så gör inget mer)
@@ -43,11 +45,23 @@ if (false !== ($handle = fopen('data_190308.csv', 'r'))) {
 
     } //end loop för att läsa varje rad i filen
 
+    array_pop($data);
+
     //stäng läsning av filen eftersom loopen är klar
     fclose($handle);
 } //end öppna filen
 
 
 // HÄR SKRIVER NI KODEN FÖR ATT LÄGGA IN I DATABASEN
-var_dump($data);
+//var_dump($data);
 
+
+require "Environment.php";
+$env = new Environment();
+require "Database.php";
+$db = new Database($env);
+
+//echo $db->migrate();
+$db->storeRows($data);
+
+echo 'Seconds taken: '.(microtime(true)-$timeStart);

@@ -1,6 +1,6 @@
 <?php
 
-class Database
+class Database2
 {
     // definiera inställningar
     protected $dbm;
