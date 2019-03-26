@@ -5,6 +5,7 @@ class Database
     // definiera inställningar
     protected $dbm;
     protected $stmt;
+    protected $lastInsertId;
 
     /**
      * Database constructor.
@@ -23,6 +24,7 @@ class Database
     }
 
     /**
+     * Migrate. Set up tables.
      * @return string
      */
     public function migrate()
@@ -30,7 +32,7 @@ class Database
         $createTableSQL = "
             DROP TABLE IF EXISTS weather;
             CREATE TABLE weather (
-              id int(11) NOT NULL,
+              id int(11) NOT NULL auto_increment,
               time datetime ,
               intervall int(11) ,
               temp_in float ,
@@ -59,16 +61,23 @@ class Database
 
     /**
      * @param string $sql
-     * @param null $data
-     * @return bool
+     * @param mixed[] $data
+     * @return int 0 or last id inserted
      */
-    public function runQuery(string $sql, $data = null)
+    public function runQuery(string $sql, array $data = null)
     {
         $this->stmt = $this->dbm->prepare($sql);
         if ($data) {
-            return $this->stmt->execute($data);
+            $success = $this->stmt->execute($data);
+            if ($success) {
+                $this->lastInsertId = $this->dbm->lastInsertId();
+                return $this->lastInsertId;
+            }
+            return false;
         }
         return $this->stmt->execute();
+
+
     }
 
     /**
@@ -83,39 +92,63 @@ class Database
     }
 
     /**
-     * @param $rows Rows to store as array
+     * @param string $sql
+     * @param array $params
+     * @return mixed Assoc array with multiple rows of arrays
+     */
+    public function fetchAll(string $sql, array $params = [])
+    {
+        $this->stmt = $this->dbm->prepare($sql);
+        $this->stmt->execute($params);
+        return $this->stmt->fetchAll();
+    }
+
+    /**
+     * @param mixed[] $rows
      * @return int Nr of rows stored
      */
-    public function storeRows($rows)
+    public function storeRows(array $rows)
     {
-        $lastId = $this->getLastId();
+
         $rowsStored = 0;
         foreach ($rows as $row) {
-            if ($row[0] > $lastId) {
+            if ($row[0] > $this->lastInsertId) {
                 $rowsStored++;
                 $this->store($row);
             }
+//            if($rowsStored == 10) { break; } // enbart för testning så att det blir hanterbart många
         }
         return $rowsStored;
     }
 
     /**
-     * @param $row
-     * @return bool
+     * @param mixed[] $row
+     * @return int 0 or lastInsertId
      */
-    public function store($row)
+    public function store(array $row)
     {
         $query = 'INSERT INTO weather VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
         return $this->runQuery($query, $row);
     }
 
     /**
-     * @return mixed
+     * @return int
      */
-    public function getLastId()
+    public function getLastInsertId()
     {
-        $query = 'SELECT MAX(id) from weather';
-        $row = $this->fetch($query);
-        return $row['MAX(id)'];
+        return $this->lastInsertId;
     }
+
+    /**
+     * @param string $begin Startdatum
+     * @param string $end Slutdatum
+     * @return mixed Indexed array of weather data
+     */
+    public function getWeather(string $begin, string $end)
+    {
+//        $query = "select * from weather where time between '$begin' and '$end'";
+        $query = "select * from weather where time between ? and ?";
+        return $this->fetchAll($query, [$begin,$end]);
+    }
+
 }

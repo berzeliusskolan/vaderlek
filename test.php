@@ -61,7 +61,8 @@ $env = new Environment();
 require "Database.php";
 $db = new Database($env);
 
-//echo $db->migrate();
+echo $db->migrate();
 $db->storeRows($data);
+var_dump($db);
 
 echo 'Seconds taken: '.(microtime(true)-$timeStart);
