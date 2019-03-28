@@ -34,6 +34,6 @@ $end = $_GET['end'] ?? $staticEnd;
 
 // printf("Now: %s", Carbon::now());
 
-var_dump($db->getWeather($begin, $end));
-// $api->json($db->getWeather());
+// var_dump($db->getWeather($begin, $end));
+$api->json($db->getWeather());
 //echo "hit";
