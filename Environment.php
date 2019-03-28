@@ -7,9 +7,9 @@ class Environment
     public function __construct()
     {
         $this->host = 'localhost';
-        $this->user = 'root';
+        $this->user = 'johkel';
         $this->pass = '';
-        $this->db = 'weather19';
+        $this->db = 'c9';
         $this->dsn = "mysql:dbname=$this->db;host=$this->host;charset=utf8";
 
         $this->settings = [
