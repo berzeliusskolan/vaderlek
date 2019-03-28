@@ -1,15 +1,15 @@
 <?php
-require 'vendor/autoload.php';
+require '../vendor/autoload.php';
 
 use Carbon\Carbon;
 
-require 'Environment.php';
+require '../app/Environment.php';
 $env = new Environment();
 
-require 'Database.php';
+require '../app/Database.php';
 $db = new Database($env);
 
-require 'Api.php';
+require '../app/Api.php';
 $api = new Api();
 
 

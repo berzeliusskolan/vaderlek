@@ -1,8 +1,8 @@
 <?php
 
-require "Environment.php";
+require "../app/Environment.php";
 $env = new Environment();
-require "Database.php";
+require "../app/Database.php";
 $db = new Database($env);
 
 echo $db->migrate();

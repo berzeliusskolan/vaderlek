@@ -4,7 +4,7 @@ $timeStart = microtime(true);
 $data = [];
 
 //skapa en koppling till filen och spara i $handle (och misslyckas det så gör inget mer)
-if (false !== ($handle = fopen('data/data_190308.csv', 'r'))) {
+if (false !== ($handle = fopen('../data/data_190308.csv', 'r'))) {
     $skip = true;
     //loopa igenom varje rad i filen $handle och dela upp varje rad utifrån tabb, \t
     while (false !== ($row = fgetcsv($handle, 1000, "\t"))) {
@@ -56,9 +56,9 @@ if (false !== ($handle = fopen('data/data_190308.csv', 'r'))) {
 //var_dump($data);
 
 
-require "Environment.php";
+require "../app/Environment.php";
 $env = new Environment();
-require "Database.php";
+require "../app/Database.php";
 $db = new Database($env);
 
 $rows = $db->storeRows($data);
